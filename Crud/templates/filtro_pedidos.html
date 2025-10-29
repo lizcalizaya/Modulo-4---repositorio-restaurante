@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Filtro de Pedidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 { color: #333; }
+        .btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ver pedidos por estado</h1>
+
+    <a href="/api/pedidos/filtrados/?estado=CREADO" class="btn">🟢 Creado</a>
+    <a href="/api/pedidos/filtrados/?estado=EN_PREPARACION" class="btn">🟡 En preparación</a>
+    <a href="/api/pedidos/filtrados/?estado=LISTO" class="btn">🔵 Listo</a>
+    <a href="/api/pedidos/filtrados/?estado=ENTREGADO" class="btn">⚪ Entregado</a>
+
+    <p style="margin-top:30px; color:#555;">Haz clic en un botón para ver los pedidos filtrados en la API.</p>
+</body>
+</html>
