@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Monitor de Órdenes</title>
+  <link rel="stylesheet" href="monitorcss.css">
+  <style>
+
+    #zona-inferior {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #eaeaea;
+      padding: 10px 20px;
+      box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    #btn-volver {
+      background: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-weight: bold;
+      display: none;
+    }
+
+    #zona-derecha-inferior {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: auto;
+    }
+
+    #filtros-inferiores {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #filtros-inferiores button {
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .filtro-verde { background: #4caf50; }
+    .filtro-azul  { background: #2196f3; }
+
+    #filtros-inferiores button:hover {
+      opacity: 0.9;
+    }
+
+    #contenedor-ultima {
+      font-size: 15px;
+      color: #fff;
+      background: rgb(14, 121, 64);
+      border-radius: 10px;
+      padding: 10px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+      min-width: 220px;
+      max-width: 280px;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="barra-estados">
+    <div class="filtros" id="filtros-superiores">
+      <button class="negro" data-filtro="todos">Todos</button>
+      <button class="naranja" data-filtro="En preparación">En preparación</button>
+      <button class="verde" data-filtro="Listo">Listo</button>
+      <button class="azul" data-filtro="Entregado">Entregado</button>
+      <button class="rojo" data-filtro="Urgente">Urgente</button>
+    </div>
+    <button id="btn-actualizar">
+      <img src="actualizar.png" alt="Actualizar" style="width:20px; vertical-align:middle; margin-right:6px;">
+      Actualizar
+    </button>
+  </div>
+
+  <!-- Contenedor de órdenes -->
+  <div class="contenedor" id="contenedor-pedidos">
+  </div>
+
+  <!--Barra inferior -->
+  <div id="zona-inferior">
+    <button id="btn-volver">Volver</button>
+    <div id="zona-derecha-inferior">
+      <div id="filtros-inferiores">
+        <button class="filtro-verde" data-filtro="Listo">Pedidos Listos</button>
+        <button class="filtro-azul" data-filtro="Entregado">Pedidos Entregados</button>
+      </div>
+      <div id="contenedor-ultima">
+        <span>Última modificación:</span>
+        <span id="ultima-actualizacion">--:--</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const contenedor = document.getElementById("contenedor-pedidos");
+    const btnActualizar = document.getElementById("btn-actualizar");
+    const btnVolver = document.getElementById("btn-volver");
+    const ultimaAct = document.getElementById("ultima-actualizacion");
+
+    ///Actualizar_hora
+    const actualizarHora = () => {
+      const ahora = new Date();
+      ultimaAct.textContent = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    };
+
+    ///Colores_por_estado
+    const obtenerColorEstado = (estado) => {
+      switch (estado) {
+        case "En preparación": return "naranja";
+        case "Listo": return "verde";
+        case "Entregado": return "azul";
+        case "Urgente": return "rojo";
+        default: return "gris";
+      }
+    };
+
+    /// Cargar_pedidos_backend
+    async function cargarPedidos() {
+      try {
+        const res = await fetch("http://localhost/???api/pedidos.php"); ///Cambia esto según tu ruta
+        const pedidos = await res.json();
+
+        contenedor.innerHTML = "";
+
+        pedidos.forEach(p => {
+          const color = obtenerColorEstado(p.estado);
+          const tarjeta = document.createElement("div");
+          tarjeta.className = `tarjeta estado-${color}`;
+          tarjeta.setAttribute("data-estado", p.estado);
+
+          const items = (p.detalles || []).map(d => `<li>${d.producto} (${d.cantidad})</li>`).join("");
+
+          tarjeta.innerHTML = `
+            <div class="encabezado">
+              <h3 class="mesa">${p.mesa}</h3>
+              <p class="hora">[${p.hora}]</p>
+            </div>
+            <div class="contenido">
+              <p>PEDIDO #${p.id}</p>
+              <ul>${items}</ul>
+            </div>
+            ${["En preparación","Urgente"].includes(p.estado)
+              ? `<button class="btn-accion">${p.estado === "Urgente" ? "INICIAR" : "TERMINAR"}</button>`
+              : ""}
+          `;
+          contenedor.appendChild(tarjeta);
+        });
+
+        actualizarHora();
+        activarFiltros(); 
+      } catch (error) {
+        console.error("Error al cargar pedidos:", error);
+        contenedor.innerHTML = "<p style='color:red;'>Error al conectar con la base de datos.</p>";
+      }
+    }
+
+    ///Boton_actualizar
+    btnActualizar.addEventListener("click", cargarPedidos);
+
+    ///Filtros
+    function activarFiltros() {
+      const tarjetas = document.querySelectorAll(".tarjeta");
+
+      ///Filtros_superiores
+      document.querySelectorAll("#filtros-superiores button").forEach(boton => {
+        boton.onclick = () => {
+          const filtro = boton.getAttribute("data-filtro");
+          const hayFiltro = filtro !== "todos";
+          tarjetas.forEach(t => {
+            const estado = t.getAttribute("data-estado");
+            t.style.display = (filtro === "todos" || estado === filtro) ? "flex" : "none";
+          });
+          btnVolver.style.display = hayFiltro ? "inline-block" : "none";
+        };
+      });
+
+      ///Filtros_inferiores
+      document.querySelectorAll("#filtros-inferiores button").forEach(boton => {
+        boton.onclick = () => {
+          const filtro = boton.getAttribute("data-filtro");
+          tarjetas.forEach(t => {
+            const estado = t.getAttribute("data-estado");
+            t.style.display = (estado === filtro) ? "flex" : "none";
+          });
+          btnVolver.style.display = "inline-block";
+        };
+      });
+    }
+
+    ////Boton volver
+    btnVolver.addEventListener("click", () => {
+      document.querySelectorAll(".tarjeta").forEach(t => t.style.display = "flex");
+      btnVolver.style.display = "none";
+    });
+
+    
+    await cargarPedidos();
+  });
+  </script>
+</body>
+</html>
