@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Monitor de Órdenes</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f2f5;
+      overflow-x: hidden;
+    }
+
+    /* ===== BARRA NEGRA SUPERIOR (HORA / ICONOS) ===== */
+    .top-bar {
+      height: 32px;
+      background: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    .top-bar .left,
+    .top-bar .right {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 12px;
+    }
+    .top-bar .left { left: 0; }
+    .top-bar .right { right: 0; }
+    .battery {
+      border: 2px solid #fff;
+      border-radius: 3px;
+      width: 18px;
+      height: 10px;
+      margin-left: 4px;
+      position: relative;
+    }
+    .battery::after {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 2px;
+      width: 3px;
+      height: 6px;
+      background: #fff;
+    }
+
+    /* ===== BARRA DE FILTROS ===== */
+    .barra-estados {
+      background: #444;
+      padding: 10px 16px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+    .chips-estados {
+      display: flex;
+      gap: 10px;
+    }
+    .chip {
+      border: none;
+      border-radius: 18px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      min-width: 110px;
+      text-align: center;
+    }
+    .chip.negro      { background: #222; }
+    .chip.naranja    { background: #ff9800; }
+    .chip.verde      { background: #4caf50; }
+    .chip.azul       { background: #2196f3; }
+    .chip.activo     { box-shadow: 0 0 0 3px rgba(255,255,255,0.4); }
+
+    #btn-actualizar {
+      border: none;
+      border-radius: 20px;
+      padding: 6px 12px;
+      background: #00bcd4;
+      color: #fff;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    #btn-actualizar img {
+      width: 20px;
+      vertical-align: middle;
+    }
+
+    /* ===== CONTENEDOR DE TARJETAS ===== */
+    .contenedor {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      padding: 16px;
+      box-sizing: border-box;
+      justify-content: flex-start;
+      padding-bottom: 80px; /* espacio para barra inferior */
+    }
+
+    .tarjeta {
+      width: 260px;
+      background: #ddd;
+      border-radius: 18px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* cabecera de color de la tarjeta (estado) */
+    .t-header {
+      padding: 10px 12px 4px 12px;
+      text-align: center;
+      color: #fff;
+    }
+    .estado-naranja .t-header { background: #ff9800; }
+    .estado-verde   .t-header { background: #4caf50; }
+    .estado-azul    .t-header { background: #2196f3; }
+    .estado-gris    .t-header { background: #777; }
+    .estado-rojo    .t-header { background: #f44336; }
+
+    .mesa-texto {
+      margin: 0;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .hora-texto {
+      margin: 0;
+      font-size: 13px;
+      font-style: italic;
+    }
+
+    .t-body {
+      background: #e0e0e0;
+      padding: 12px 16px 16px 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .t-body p {
+      margin: 0 0 6px 0;
+      font-weight: bold;
+    }
+
+    .t-body ul {
+      margin: 0 0 10px 18px;
+      padding: 0;
+      font-size: 14px;
+    }
+
+    .btn-accion {
+      margin-top: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+      color: #fff;
+      width: 100%;
+      font-size: 16px;
+    }
+    .btn-iniciar  { background: #2e7d32; }
+    .btn-terminar { background: #b71c1c; }
+
+    /* ===== BARRA INFERIOR ===== */
+    #zona-inferior {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #555;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      box-sizing: border-box;
+    }
+
+    #btn-volver {
+      background: #00bcd4;
+      border: none;
+      border-radius: 18px;
+      padding: 8px 16px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+      display: none;
+    }
+
+    #zona-derecha-inferior {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #filtros-inferiores button {
+      border: none;
+      border-radius: 18px;
+      padding: 6px 10px;
+      font-size: 13px;
+      font-weight: bold;
+      color: #fff;
+      cursor: pointer;
+    }
+    .filtro-verde { background: #4caf50; }
+    .filtro-azul  { background: #2196f3; }
+
+    #contenedor-ultima {
+      background: #0b7d3b;
+      border-radius: 12px;
+      padding: 5px 12px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra negra superior -->
+  <div class="top-bar">
+    <div class="left">📶</div>
+    <div id="hora-top">14:15</div>
+    <div class="right">
+      100%
+      <div class="battery"></div>
+    </div>
+  </div>
+
+  <!-- Barra de filtros -->
+  <div class="barra-estados">
+    <div class="chips-estados">
+      <button class="chip negro"   data-filtro="todos"          id="chip-todos">Todos: 0</button>
+      <button class="chip naranja" data-filtro="Creado"         id="chip-pend">Pendiente: 0</button>
+      <button class="chip naranja" data-filtro="En preparación" id="chip-prep">En preparación: 0</button>
+      <button class="chip verde"   data-filtro="Listo"          id="chip-listo">Listo: 0</button>
+      <button class="chip azul"    data-filtro="Entregado"      id="chip-ent">Entregado: 0</button>
+    </div>
+    <button id="btn-actualizar">
+      <img src="actualizar.png" alt="Actualizar" />
+      Actualizar
+    </button>
+  </div>
+
+  <!-- Tarjetas -->
+  <div class="contenedor" id="contenedor-pedidos"></div>
+
+  <!-- Barra inferior -->
+  <div id="zona-inferior">
+    <button id="btn-volver">Volver</button>
+    <div id="zona-derecha-inferior">
+      <div id="filtros-inferiores">
+        <button class="filtro-verde" data-filtro="Listo">Pedidos Listos</button>
+        <button class="filtro-azul"  data-filtro="Entregado">Pedidos Entregados</button>
+      </div>
+      <div id="contenedor-ultima">
+        Última modificación: <span id="ultima-actualizacion">--:--</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:8000/api/pedidos/";
+    let pedidosGlobal = [];
+    let filtroActual = "todos";
+
+    const contenedor = document.getElementById("contenedor-pedidos");
+    const btnActualizar = document.getElementById("btn-actualizar");
+    const btnVolver = document.getElementById("btn-volver");
+    const ultimaAct = document.getElementById("ultima-actualizacion");
+
+    /* ===== HORA EN BARRA SUPERIOR E INFERIOR ===== */
+    function actualizarHoraTop() {
+      const ahora = new Date();
+      document.getElementById("hora-top").textContent =
+        ahora.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    actualizarHoraTop();
+    setInterval(actualizarHoraTop, 60000);
+
+    function actualizarHoraUltima() {
+      const ahora = new Date();
+      ultimaAct.textContent = ahora.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    /* ===== URGENCIA SEGÚN TIEMPO (>= 10 min) ===== */
+    function esUrgente(p) {
+      if (!p.hora) return false;
+
+      const partes = p.hora.split(":");
+      if (partes.length < 2) return false;
+
+      const h = parseInt(partes[0], 10);
+      const m = parseInt(partes[1], 10);
+      if (Number.isNaN(h) || Number.isNaN(m)) return false;
+
+      const ahora = new Date();
+      const fechaPedido = new Date();
+      fechaPedido.setHours(h, m, 0, 0);
+
+      const diffMin = (ahora - fechaPedido) / 60000; // minutos
+
+      // Cambia 10 por los minutos que quieras de límite
+      return diffMin >= 10 && p.estado !== "Entregado";
+    }
+
+    /* ===== COLORES BASE POR ESTADO ===== */
+    function obtenerColorEstado(estado) {
+      switch (estado) {
+        case "En preparación": return "naranja";
+        case "Listo":          return "verde";
+        case "Entregado":      return "azul";
+        case "Creado":         return "gris";
+        default:               return "gris";
+      }
+    }
+
+    /* ===== SIGUIENTE ESTADO PARA BOTONES ===== */
+    function siguienteEstado(estado) {
+      switch (estado) {
+        case "Creado":         return "EN_PREPARACION";
+        case "En preparación": return "LISTO";
+        case "Listo":          return "ENTREGADO";
+        default:               return null;
+      }
+    }
+
+    async function cambiarEstadoPedido(id, estadoActual) {
+      const nuevoCodigo = siguienteEstado(estadoActual);
+      if (!nuevoCodigo) return;
+
+      try {
+        const res = await fetch(API_URL + id + "/", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ estado: nuevoCodigo })
+        });
+        if (!res.ok) {
+          console.error("Error al cambiar estado", await res.text());
+          alert("No se pudo cambiar el estado");
+          return;
+        }
+        await cargarPedidos(); // refrescar
+      } catch (e) {
+        console.error(e);
+        alert("Error de conexión con el servidor");
+      }
+    }
+
+    /* ===== CONTADORES DE CHIPS ===== */
+    function actualizarContadores() {
+      const noEntregados = pedidosGlobal.filter(p => p.estado !== "Entregado");
+      const total  = noEntregados.length;
+      const creados = pedidosGlobal.filter(p => p.estado === "Creado").length;
+      const enPrep  = pedidosGlobal.filter(p => p.estado === "En preparación").length;
+      const listos  = pedidosGlobal.filter(p => p.estado === "Listo").length;
+      const entreg  = pedidosGlobal.filter(p => p.estado === "Entregado").length;
+
+      document.getElementById("chip-todos").textContent = `Todos: ${total}`;
+      document.getElementById("chip-pend").textContent  = `Pendiente: ${creados}`;
+      document.getElementById("chip-prep").textContent  = `En preparación: ${enPrep}`;
+      document.getElementById("chip-listo").textContent = `Listo: ${listos}`;
+      document.getElementById("chip-ent").textContent   = `Entregado: ${entreg}`;
+
+      document.querySelectorAll(".chip").forEach(ch => ch.classList.remove("activo"));
+      const chipActivo = document.querySelector(`.chip[data-filtro="${filtroActual}"]`);
+      if (chipActivo) chipActivo.classList.add("activo");
+    }
+
+    /* ===== DIBUJAR TARJETAS SEGÚN FILTRO ===== */
+    function aplicarFiltroYRender() {
+      contenedor.innerHTML = "";
+      let lista = pedidosGlobal.slice();
+
+      if (filtroActual === "todos") {
+        // En "Todos" NO mostramos los entregados
+        lista = lista.filter(p => p.estado !== "Entregado");
+      } else {
+        // En otros filtros mostramos solo ese estado
+        lista = lista.filter(p => p.estado === filtroActual);
+      }
+
+      lista.forEach(p => {
+        const urgente = esUrgente(p);
+        const colorBase = obtenerColorEstado(p.estado);
+        const color = urgente ? "rojo" : colorBase;
+
+        const tarjeta = document.createElement("div");
+        tarjeta.className = `tarjeta estado-${color}`;
+
+        const items = (p.detalles || []).map(linea => `<li>${linea}</li>`).join("");
+
+        tarjeta.innerHTML = `
+          <div class="t-header">
+            <h3 class="mesa-texto">${(p.mesa || "").toUpperCase()}</h3>
+            <p class="hora-texto">[${p.hora}]</p>
+          </div>
+          <div class="t-body">
+            <div>
+              <p>PEDIDO #${p.id}</p>
+              <ul>${items}</ul>
+            </div>
+            ${
+              ["Creado","En preparación"].includes(p.estado)
+                ? `<button class="btn-accion ${
+                      p.estado === "Creado" ? "btn-iniciar" : "btn-terminar"
+                   }" data-id="${p.id}" data-estado="${p.estado}">
+                      ${p.estado === "Creado" ? "INICIAR" : "TERMINAR"}
+                   </button>`
+                : ""
+            }
+          </div>
+        `;
+        contenedor.appendChild(tarjeta);
+      });
+
+      // listeners de los botones
+      document.querySelectorAll(".btn-accion").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const id = btn.getAttribute("data-id");
+          const estado = btn.getAttribute("data-estado");
+          cambiarEstadoPedido(id, estado);
+        });
+      });
+
+      actualizarContadores();
+    }
+
+    /* ===== CARGAR DESDE LA API ===== */
+    async function cargarPedidos() {
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        pedidosGlobal = data;
+        aplicarFiltroYRender();
+        actualizarHoraUltima();
+      } catch (e) {
+        console.error(e);
+        contenedor.innerHTML =
+          "<p style='color:red; font-weight:bold;'>Error al conectar con la base de datos.</p>";
+      }
+    }
+
+    /* ===== EVENTOS DE FILTROS ===== */
+    // Filtros superiores
+    document.querySelectorAll(".chips-estados .chip").forEach(boton => {
+      boton.addEventListener("click", () => {
+        filtroActual = boton.getAttribute("data-filtro");
+        aplicarFiltroYRender();
+        btnVolver.style.display = filtroActual === "todos" ? "none" : "inline-block";
+      });
+    });
+
+    // Filtros inferiores
+    document.querySelectorAll("#filtros-inferiores button").forEach(boton => {
+      boton.addEventListener("click", () => {
+        filtroActual = boton.getAttribute("data-filtro");
+        aplicarFiltroYRender();
+        btnVolver.style.display = "inline-block";
+      });
+    });
+
+    // Botón volver
+    btnVolver.addEventListener("click", () => {
+      filtroActual = "todos";
+      aplicarFiltroYRender();
+      btnVolver.style.display = "none";
+    });
+
+    // Botón actualizar
+    btnActualizar.addEventListener("click", cargarPedidos);
+
+    // Cargar al inicio
+    cargarPedidos();
+  </script>
+</body>
+</html>
