@@ -32,7 +32,7 @@ python manage.py runserver
 5. Acceder a las páginas del sistema
 
      Página	               URL	                         Descripción
-Página principal	/	                        Lista los pedidos y permite crear nuevos
+Página principal	     /	                   Lista los pedidos y permite crear nuevos
 Ver pedidos por estado	/pedidos/estado	    Filtra pedidos según su estado
 Administrar pedidos	     /pedidos/admin	         Permite buscar, editar o eliminar pedidos
 Cola de cocina (API)	/cocina/cola	         Muestra los pedidos pendientes en formato JSON
@@ -52,4 +52,5 @@ Luego desactiva el entorno virtual en la consola (cmd):
 deactivate
 
 Verás que desaparece (.venv) del inicio de la línea: eso indica que se cerró correctamente.
+
 
