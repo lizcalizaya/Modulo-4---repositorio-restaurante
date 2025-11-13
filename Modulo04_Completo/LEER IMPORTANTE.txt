@@ -1,0 +1,56 @@
+1. Cómo abrir, ejecutar y cerrar el proyecto Django ModuloCocina04
+
+
+cd C:\Users\TU_USUARIO\ModuloCocina04
+
+2. Activar el entorno virtual
+
+El proyecto ya incluye un entorno virtual (.venv).
+
+En Windows PowerShell o cmd, ejecuta:
+
+.venv\Scripts\activate
+
+Si ves algo como (.venv) al inicio de la línea, significa que el entorno está activado correctamente.
+
+3. Aplicar migraciones de la base de datos
+
+Antes de correr el servidor, asegurarse de aplicar las migraciones de Django.
+
+python manage.py makemigrations
+python manage.py migrate
+
+
+Esto creará el archivo de base de datos db.sqlite3 con todas las tablas necesarias.
+
+4. Ejecutar el servidor
+
+Una vez creadas las tablas, ejecutar el servidor:
+
+python manage.py runserver
+
+5. Acceder a las páginas del sistema
+
+     Página	               URL	                         Descripción
+Página principal	     /	                   Lista los pedidos y permite crear nuevos
+Ver pedidos por estado	/pedidos/estado	    Filtra pedidos según su estado
+Administrar pedidos	     /pedidos/admin	         Permite buscar, editar o eliminar pedidos
+Cola de cocina (API)	/cocina/cola	         Muestra los pedidos pendientes en formato JSON
+Cambiar estado (API)	/cocina/pedidos/{id}    Permite actualizar el estado vía PATCH o Postman
+
+
+8. Cerrar el proyecto
+
+Para cerrar correctamente el servidor:
+
+En la consola (cmd) donde está corriendo, presiona:
+
+CTRL + C
+
+Luego desactiva el entorno virtual en la consola (cmd):
+
+deactivate
+
+Verás que desaparece (.venv) del inicio de la línea: eso indica que se cerró correctamente.
+
+
