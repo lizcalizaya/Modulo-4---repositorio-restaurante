@@ -1,0 +1,126 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'monitor/monitorcss.css' %}">
+<script src="{% static 'monitor/monitorjv.js' %}"></script>
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Monitor de Órdenes</title>
+
+<link rel="stylesheet" href="monitorcss.css">
+
+<style>
+    #zona-inferior {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #eaeaea;
+    padding: 10px 20px;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+    z-index: 1000;
+    }
+
+    #btn-volver {
+    background: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-weight: bold;
+    display: none;
+    }
+
+    #zona-derecha-inferior {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    }
+
+    #filtros-inferiores button {
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+
+    .filtro-verde { background: #4caf50; }
+    .filtro-azul  { background: #2196f3; }
+
+    #contenedor-ultima {
+    font-size: 15px;
+    color: #fff;
+    background: rgb(14, 121, 64);
+    border-radius: 10px;
+    padding: 10px 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    min-width: 220px;
+    max-width: 280px;
+    flex-shrink: 0;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- BARRA SUPERIOR -->
+<div class="barra-estados">
+    <div class="filtros" id="filtros-superiores">
+        <button class="negro" data-filtro="todos" id="filtro-todos">Todos</button>
+        <button class="naranja" data-filtro="En preparación" id="filtro-preparacion">En preparación</button>
+        <button class="verde" data-filtro="Listo" id="filtro-listo">Listo</button>
+        <button class="azul" data-filtro="Entregado" id="filtro-entregado">Entregado</button>
+        <button class="rojo" data-filtro="Urgente" id="filtro-urgente">Urgente</button>
+    </div>
+
+    <button id="btn-actualizar">
+        <img src="{% static 'monitor/actualizar.png' %}" 
+            alt="Actualizar" 
+            style="width:20px; vertical-align:middle; margin-right:6px;">
+    Actualizar
+    </button>
+</div>
+
+<!-- CONTENEDOR TARJETAS -->
+<div class="contenedor" id="contenedor-pedidos"></div>
+
+<!-- BARRA INFERIOR -->
+<div id="zona-inferior">
+    <button id="btn-volver">Volver</button>
+
+    <div id="zona-derecha-inferior">
+    <div id="filtros-inferiores">
+        <button class="filtro-verde" data-filtro="Listo">Pedidos Listos</button>
+        <button class="filtro-azul" data-filtro="Entregado">Pedidos Entregados</button>
+    </div>
+
+    <div id="contenedor-ultima">
+        <span>Última modificación:</span>
+        <span id="ultima-actualizacion">--:--</span>
+    </div>
+    </div>
+</div>
+
+<script src="monitorjv.js"></script>
+
+<!-- Contenedor de notificaciones -->
+<div id="notificaciones"></div>
+
+</body>
+</html>
