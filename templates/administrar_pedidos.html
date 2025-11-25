@@ -1,0 +1,260 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrar pedidos</title>
+  <style>
+    * { box-sizing:border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at top left, #e3f0ff 0, #f6f7fb 40%, #f2f3f8 100%);
+      color: #111827;
+    }
+    .app-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: #0f172a;
+      color: #e5e7eb;
+      display:flex;
+      flex-direction:column;
+      padding:20px 18px;
+    }
+    .sidebar-logo {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:26px;
+    }
+    .logo-circle {
+      width:38px;height:38px;border-radius:50%;
+      background:linear-gradient(135deg,#0ea5e9,#6366f1);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-weight:700;
+    }
+    .logo-text{display:flex;flex-direction:column;}
+    .logo-title{font-size:15px;font-weight:700;}
+    .logo-subtitle{font-size:12px;color:#9ca3af;}
+    .sidebar-nav{display:flex;flex-direction:column;gap:6px;margin-bottom:auto;}
+    .nav-item{
+      display:flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:10px;
+      text-decoration:none;font-size:14px;
+      color:#e5e7eb;
+      transition:background .15s,color .15s,transform .05s;
+    }
+    .nav-item:hover{background:rgba(148,163,184,.18);transform:translateX(1px);}
+    .nav-item.active{background:linear-gradient(90deg,#3b82f6,#0ea5e9);color:#fff;}
+    .nav-dot{width:8px;height:8px;border-radius:999px;background:#6b7280;}
+    .nav-dot-blue{background:#bfdbfe;}
+    .sidebar-footer{
+      margin-top:24px;padding:10px 12px;border-radius:12px;
+      background:rgba(15,23,42,.7);border:1px solid rgba(148,163,184,.25);
+      font-size:12px;
+    }
+    .sidebar-footer-title{display:block;color:#9ca3af;}
+    .sidebar-footer-text{font-weight:600;color:#e5e7eb;}
+
+    .main-area{display:flex;flex-direction:column;min-height:100vh;}
+    .topbar{
+      height:68px;background:rgba(255,255,255,.9);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(209,213,219,.6);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 24px;
+    }
+    .page-title{margin:0;font-size:20px;font-weight:700;}
+    .page-subtitle{margin:2px 0 0 0;font-size:13px;color:#6b7280;}
+    .user-chip{
+      display:flex;align-items:center;gap:8px;
+      padding:4px 10px;border-radius:999px;
+      background:#eef2ff;border:1px solid #c7d2fe;
+    }
+    .user-avatar{
+      width:26px;height:26px;border-radius:999px;
+      background:linear-gradient(135deg,#4f46e5,#0ea5e9);
+      display:flex;align-items:center;justify-content:center;
+      color:#fff;font-size:13px;font-weight:700;
+    }
+    .user-info{display:flex;flex-direction:column;}
+    .user-name{font-size:13px;font-weight:600;}
+    .user-role{font-size:11px;color:#6b7280;}
+
+    .contenedor-page{
+      flex:1;
+      padding:18px 24px 32px 24px;
+    }
+    .panel{
+      max-width:1000px;
+      margin:0 auto;
+      background:#ffffff;
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(15,23,42,.08);
+      padding:20px 22px;
+    }
+    h1{margin:0 0 6px 0;font-size:20px;}
+    .subtexto{color:#6b7280;font-size:13px;margin-bottom:16px;}
+
+    .buscador{
+      display:flex;gap:8px;margin-bottom:16px;
+    }
+    .buscador input[type="text"]{
+      flex:1;padding:8px 10px;border-radius:10px;
+      border:1px solid #d1d5db;font-size:14px;
+      background:#f9fafb;
+    }
+    .buscador button{
+      padding:8px 14px;border-radius:999px;border:none;
+      background:#3b82f6;color:#fff;font-weight:600;
+      cursor:pointer;font-size:13px;
+      box-shadow:0 6px 14px rgba(59,130,246,.3);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+    th,td{
+      padding:8px 6px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left;
+    }
+    th{
+      color:#6b7280;
+      font-weight:600;
+      background:#f9fafb;
+    }
+    .acciones{display:flex;gap:6px;}
+    .btn-editar,
+    .btn-eliminar{
+      border:none;padding:4px 8px;border-radius:999px;
+      font-size:12px;cursor:pointer;text-decoration:none;
+      font-weight:600;display:inline-block;
+    }
+    .btn-editar{background:#0ea5e9;color:#fff;}
+    .btn-eliminar{background:#ef4444;color:#fff;}
+    .mensaje-vacio{
+      font-size:13px;color:#6b7280;padding:15px 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">M</div>
+      <div class="logo-text">
+        <span class="logo-title">Modulo 4</span>
+        <span class="logo-subtitle">Pedidos Cocina</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'monitor' %}" class="nav-item">
+        <span class="nav-dot"></span>Monitor
+      </a>
+      <a href="{% url 'administrar_pedidos' %}" class="nav-item active">
+        <span class="nav-dot nav-dot-blue"></span>Administrar pedidos
+      </a>
+      <a href="{% url 'historial_pedidos' %}" class="nav-item">
+        <span class="nav-dot"></span>
+        Historial de pedidos
+      </a>
+      <a href="/admin/" class="nav-item">
+        <span class="nav-dot"></span>Admin Django
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-footer-title">Modo</span>
+      <span class="sidebar-footer-text">Gestión de pedidos</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <header class="topbar">
+      <div>
+        <h1 class="page-title">Administrar pedidos</h1>
+        {% if consulta %}
+          <p class="page-subtitle">
+            Resultados para: "<strong>{{ consulta }}</strong>"
+          </p>
+        {% else %}
+          <p class="page-subtitle">Mostrando los pedidos más recientes.</p>
+        {% endif %}
+      </div>
+      <div class="user-chip">
+        <div class="user-avatar">AD</div>
+        <div class="user-info">
+          <span class="user-name">Administrador</span>
+          <span class="user-role">Pedidos</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="contenedor-page">
+      <div class="panel">
+        <!-- Buscador -->
+        <form method="get" class="buscador">
+          <input type="text" name="q" value="{{ consulta }}"
+                 placeholder="Buscar por Nº de Pedido o Nombre de cliente">
+          <button type="submit">Buscar</button>
+        </form>
+
+        {% if pedidos %}
+          <table>
+            <thead>
+              <tr>
+                <th>Nº Pedido</th>
+                <th>Mesa</th>
+                <th>Cliente</th>
+                <th>Orden</th>
+                <th>Estado</th>
+                <th>Ingreso</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for p in pedidos %}
+              <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.mesa }}</td>
+                <td>{{ p.cliente }}</td>
+                <td>{{ p.descripcion }}</td>
+                <td>{{ p.get_estado_display }}</td>
+                <td>{{ p.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                <td>
+                  <div class="acciones">
+                    <a href="{% url 'editar_pedido' p.id %}" class="btn-editar">Modificar</a>
+                    <form method="post" style="display:inline;">
+                      {% csrf_token %}
+                      <input type="hidden" name="eliminar_id" value="{{ p.id }}">
+                      <button type="submit" class="btn-eliminar"
+                              onclick="return confirm('¿Eliminar el pedido {{ p.id }}?');">
+                        Eliminar
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% else %}
+          <p class="mensaje-vacio">No se encontraron pedidos.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
