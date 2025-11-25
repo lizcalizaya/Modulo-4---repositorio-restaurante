@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pedidos</title>
+
+    <style>
+        body { font-family: Arial; background: #f1f1f1; padding: 40px; }
+        .card {
+            background: white;
+            padding: 20px;
+            margin: 10px auto;
+            width: 350px;
+            border-radius: 8px;
+            text-align: left;
+            box-shadow: 0 2px 6px #00000025;
+        }
+        .btn { padding: 8px 16px; background: #007bff; color: white; border-radius: 6px; text-decoration: none; }
+        .btn:hover { background: #0056b3; }
+        .refresh { cursor: pointer; font-size: 25px; margin-left: 10px; }
+        .urgente { border-left: 8px solid red; }
+        .acciones button {
+            margin: 5px;
+            padding: 6px 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            border: none;
+        }
+        .editar { background: #ffb400; }
+        .eliminar { background: #d9534f; color: white; }
+    </style>
+
+    <script>
+        async function cargarPedidos() {
+            const cont = document.getElementById("contenedor");
+            cont.innerHTML = "Cargando...";
+
+            let data = await fetch("/api/pedidos/").then(r => r.json());
+
+            cont.innerHTML = "";
+
+            data.forEach(p => {
+                let urgenteClase = p.estado === "URGENTE" ? "urgente" : "";
+
+                cont.innerHTML += `
+                    <div class="card ${urgenteClase}">
+                        <h3>Mesa ${p.mesa}</h3>
+                        <p><b>Cliente:</b> ${p.cliente}</p>
+                        <p><b>Descripción:</b> ${p.descripcion}</p>
+                        <p><b>Estado:</b> ${p.estado}</p>
+
+                        <div class="acciones">
+                            <button class="editar" onclick="editar(${p.id})">Editar</button>
+                            <button class="eliminar" onclick="eliminarPedido(${p.id})">Eliminar</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function refrescar() { cargarPedidos(); }
+
+        async function eliminarPedido(id) {
+            if (!confirm("¿Eliminar pedido?")) return;
+
+            await fetch(`/api/pedidos/${id}/`, {
+                method: "DELETE"
+            });
+
+            cargarPedidos();
+        }
+
+        async function editar(id) {
+            const mesa = prompt("Nueva mesa:");
+            const cliente = prompt("Nuevo cliente:");
+            const desc = prompt("Nueva descripción:");
+            const estado = prompt("Nuevo estado (URGENTE, CREADO, EN_PREPARACION, LISTO):");
+
+            await fetch(`/api/pedidos/${id}/`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    mesa: mesa,
+                    cliente: cliente,
+                    descripcion: desc,
+                    estado: estado
+                })
+            });
+
+            cargarPedidos();
+        }
+
+        window.onload = cargarPedidos;
+    </script>
+</head>
+<body>
+
+<h1>Gestión de Pedidos</h1>
+
+<button class="refresh" onclick="refrescar()">🔄</button>
+
+<br><br>
+
+<a href="/api/pedidos/filtrados/?estado=URGENTE" class="btn">🔺 Urgentes</a>
+<a href="/api/pedidos/filtrados/?estado=CREADO" class="btn">🟢 Creado</a>
+<a href="/api/pedidos/filtrados/?estado=EN_PREPARACION" class="btn">🟡 En preparación</a>
+<a href="/api/pedidos/filtrados/?estado=LISTO" class="btn">🔵 Listo</a>
+
+<br><br>
+
+<div id="contenedor"></div>
+
+</body>
+</html>
