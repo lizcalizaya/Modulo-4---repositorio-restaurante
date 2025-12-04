@@ -169,7 +169,5 @@ def historial_pedidos(request):
             "hora_ingreso": hora_ingreso,
             "hora_salida": hora_salida,
         })
-    
-
     contexto = {"registros": registros}
     return render(request, "historial_pedidos.html", contexto)
