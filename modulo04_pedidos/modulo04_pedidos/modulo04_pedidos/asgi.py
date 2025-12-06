@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """
 ASGI config for modulo04_pedidos project.
 
@@ -14,3 +15,21 @@ from django.core.asgi import get_asgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'modulo04_pedidos.settings')
 
 application = get_asgi_application()
+=======
+"""
+ASGI config for modulo04_pedidos project.
+
+It exposes the ASGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
+"""
+
+import os
+
+from django.core.asgi import get_asgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'modulo04_pedidos.settings')
+
+application = get_asgi_application()
+>>>>>>> 67ce92b636632aa62be6ec27ba7a04f024838836
