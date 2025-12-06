@@ -7,7 +7,7 @@ SECRET_KEY = 'cambia-esto-en-produccion'
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['modulo-4-repositorio-restaurante-1.onrender.com', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
