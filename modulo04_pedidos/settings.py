@@ -78,7 +78,6 @@ DATABASES = {
 }
 
 # 7. ARCHIVOS ESTÁTICOS (CONFIGURACIÓN DE PRODUCCIÓN)
-# URL base para los estáticos
 STATIC_URL = '/static/'
 
 # Directorios donde Django buscará archivos estáticos en desarrollo.
