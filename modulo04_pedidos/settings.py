@@ -5,7 +5,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'cambia-esto-en-produccion'
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     'modulo-4-repositorio-restaurante-1.onrender.com', 
