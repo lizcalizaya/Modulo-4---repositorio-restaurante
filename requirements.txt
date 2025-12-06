@@ -3,3 +3,4 @@ gunicorn
 pillow
 whitenoise
 djangorestframework
+dj-database-url
