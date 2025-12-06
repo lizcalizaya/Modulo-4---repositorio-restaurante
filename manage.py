@@ -1,9 +1,9 @@
-
 import os
 import sys
 
 if __name__ == '__main__':
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_pedidos.settings')
+    # CAMBIO CRÍTICO: Apunta al módulo de configuración correcto
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'modulo04_pedidos.settings') 
 
     try:
         from django.core.management import execute_from_command_line
