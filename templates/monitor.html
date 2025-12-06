@@ -1,0 +1,131 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Monitor de Órdenes</title>
+
+  <!-- CSS principal del monitor -->
+  <link rel="stylesheet" href="{% static 'monitor/monitorcss.css' %}">
+</head>
+
+<body>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-circle">M</div>
+      <div class="logo-text">
+        <span class="logo-title">Modulo 4</span>
+        <span class="logo-subtitle">Pedidos Cocina</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'monitor' %}" class="nav-item active">
+        <span class="nav-dot nav-dot-blue"></span>
+        Monitor
+      </a>
+      <a href="{% url 'administrar_pedidos' %}" class="nav-item">
+        <span class="nav-dot"></span>
+        Administrar pedidos
+      </a>
+      <a href="{% url 'historial_pedidos' %}" class="nav-item">
+        <span class="nav-dot"></span>
+        Historial de pedidos
+      </a>
+      <a href="/admin/" class="nav-item">
+        <span class="nav-dot"></span>
+        Admin Django
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="sidebar-footer-title">Estado sistema</span>
+      <span class="sidebar-footer-text">Conectado a API</span>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title">Monitor de Órdenes</h1>
+        <p class="page-subtitle">Visualiza y controla los pedidos activos en cocina.</p>
+      </div>
+      <div class="topbar-right">
+        <div class="user-chip">
+          <div class="user-avatar">CO</div>
+          <div class="user-info">
+            <span class="user-name">Cocina</span>
+            <span class="user-role">Monitor</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- FILTROS / CONTADORES (estilo tarjetas de colores) -->
+    <section class="stats-bar">
+      <div class="stats-filters" id="filtros-superiores">
+        <button class="stat-pill negro" data-filtro="todos" id="filtro-todos">Todos (0)</button>
+        <button class="stat-pill naranja" data-filtro="En preparación" id="filtro-preparacion">En preparación (0)</button>
+        <button class="stat-pill verde" data-filtro="Listo" id="filtro-listo">Listo (0)</button>
+        <button class="stat-pill azul" data-filtro="Entregado" id="filtro-entregado">Entregado (0)</button>
+        <button class="stat-pill rojo" data-filtro="Urgente" id="filtro-urgente">Urgente (0)</button>
+      </div>
+
+    <div class="barra-busqueda">
+        <input
+            type="text"
+            id="buscador-pedidos"
+            placeholder="Buscar por mesa o cliente"
+        />
+    <select id="orden-tiempo">
+        <option value="recientes">Más recientes primero</option>
+        <option value="antiguos">Más antiguos primero</option>
+    </select>
+    </div>
+
+      <button id="btn-actualizar" class="btn-actualizar">
+        <img src="{% static 'monitor/actualizar.png' %}"
+             alt="Actualizar"
+             class="icono-actualizar">
+      </button>
+    </section>
+
+    <!-- TABLERO DE TARJETAS -->
+    <section class="board-wrapper">
+      <div class="contenedor" id="contenedor-pedidos"></div>
+    </section>
+
+    <!-- BARRA INFERIOR -->
+    <footer id="zona-inferior">
+      <button id="btn-volver">Quitar filtro</button>
+
+      <div id="zona-derecha-inferior">
+        <div id="contenedor-ultima">
+          <span>Última actualización:</span>
+          <span id="ultima-actualizacion">--:--</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Contenedor de notificaciones flotantes -->
+<div id="notificaciones"></div>
+
+<div id="modal-detalle" class="modal-oculto">
+  <div class="modal-contenido">
+    <button class="modal-cerrar">✕</button>
+    <div id="modal-detalle-body">
+      <!-- Aquí se cargan los datos del pedido -->
+    </div>
+  </div>
+</div>
+<!-- JS del monitor (sin cambios) -->
+<script src="{% static 'monitor/monitorjv.js' %}"></script>
+</body>
+</html>

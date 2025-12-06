@@ -1,0 +1,486 @@
+body {
+margin: 0;
+font-family: Arial, sans-serif;
+background: #f2f2f2;
+}
+
+.barra-estados {
+display: flex;
+justify-content: space-between;
+align-items: center;
+background: #636363;
+padding: 10px 20px;
+}
+
+.filtros {
+display: flex;
+gap: 8px;
+}
+
+.filtros button {
+border: none;
+padding: 8px 14px;
+font-weight: bold;
+color: white;
+border-radius: 20px;
+cursor: pointer;
+font-size: 14px;
+}
+
+.negro   { background: #333; }
+.naranja { background: #f7a11a; }
+.verde   { background: #4caf50; }
+.azul    { background: #2196f3; }
+.rojo    { background: #e53935; }
+
+#btn-actualizar {
+background: #00a0b0;
+border: none;
+color: white;
+font-weight: bold;
+padding: 8px 16px;
+border-radius: 20px;
+cursor: pointer;
+font-size: 14px;
+}
+
+.contenedor {
+display: flex;
+justify-content: space-around;
+flex-wrap: wrap;
+gap: 25px;
+padding: 25px;
+}
+
+.tarjeta {
+width: 300px;
+height: 280px;
+border-radius: 10px;
+background: #e8e8e8;
+overflow: hidden;
+box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+display: flex;
+flex-direction: column;
+justify-content: space-between;
+}
+
+.encabezado {
+color: white;
+text-align: center;
+padding: 10px 0;
+}
+
+.estado-naranja .encabezado { background: #f7a11a; }
+.estado-rojo .encabezado    { background: #e53935; }
+.estado-verde .encabezado   { background: #4caf50; }
+.estado-azul .encabezado    { background: #2196f3; }
+
+.mesa {
+margin: 0;
+font-size: 22px;
+font-weight: bold;
+}
+
+.hora {
+font-size: 14px;
+margin: 0;
+}
+
+.contenido {
+flex: 1;
+padding: 15px 20px 0 20px;
+display: flex;
+flex-direction: column;
+justify-content: flex-start;
+gap: 6px;
+}
+
+.btn-accion {
+margin-top: auto;
+margin-bottom: 15px;
+width: 90%;
+align-self: center;
+display: block;
+text-align: center;
+}
+
+.contenido p {
+margin: 0;
+font-weight: bold;
+font-size: 16px;
+}
+
+.contenido ul {
+list-style: none;
+margin: 8px 0 0 0;
+padding-left: 15px;
+}
+
+.contenido ul li {
+margin-bottom: 4px;
+font-size: 15px;
+color: #222;
+}
+
+.btn-accion {
+width: 90%;
+align-self: center;
+border: none;
+color: white;
+font-size: 18px;
+font-weight: bold;
+padding: 12px 0;
+cursor: pointer;
+border-radius: 5px;
+margin-bottom: 15px;
+}
+
+.estado-naranja .btn-accion {
+background: #8b0000; 
+}
+
+.estado-rojo .btn-accion {
+background: #388e3c; 
+}
+
+.btn-accion:hover {
+opacity: 0.9;
+}
+
+.encabezado .mesa,
+.encabezado .hora {
+color: black;
+}
+#zona-inferior {
+position: fixed;
+bottom: 0;
+left: 0;
+width: 100%;
+display: flex;
+flex-wrap: wrap;             
+justify-content: space-between;
+align-items: center;
+background: #eaeaea;
+padding: 10px 20px;
+box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+z-index: 1000;
+gap: 12px;                    
+}
+
+#btn-volver {
+background: #2196f3;
+color: white;
+border: none;
+border-radius: 10px;
+padding: 10px 18px;
+cursor: pointer;
+font-weight: bold;
+font-size: 15px;
+display: none;
+transition: background 0.2s ease-in-out;
+}
+
+
+#zona-derecha-inferior {
+display: flex;
+flex-wrap: wrap;              
+align-items: center;
+gap: 12px;
+margin-left: auto;
+min-width: 0;                 
+}
+
+
+#filtros-inferiores {
+display: flex;
+gap: 10px;
+}
+
+#filtros-inferiores button {
+border: none;
+color: white;
+font-weight: bold;
+border-radius: 8px;
+padding: 8px 14px;
+cursor: pointer;
+font-size: 14px;
+box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.filtro-verde { background: #4caf50; }
+.filtro-azul  { background: #2196f3; }
+
+#filtros-inferiores button:hover {
+opacity: 0.9;
+}
+
+/* ============================
+ESTADOS DE TARJETA
+============================ */
+
+/* Nuevo / Creado = GRIS */
+.estado-gris .encabezado {
+background-color: #bdbdbd !important;  /* gris */
+color: black;
+}
+
+/* En preparación = AMARILLO */
+.estado-naranja .encabezado {
+background-color: #F7A11A !important; /* el mismo amarillo del monitor original */
+color: black;
+}
+
+/* Listo = VERDE */
+.estado-verde .encabezado {
+background-color: #4CAF50 !important;
+color: white;
+}
+
+/* Entregado = AZUL */
+.estado-azul .encabezado {
+background-color: #2196F3 !important;
+color: white;
+}
+
+/* Urgente = ROJO (si alguna vez se usa) */
+.estado-rojo .encabezado {
+background-color: #E53935 !important;
+color: white;
+}
+
+
+/* ============================
+BOTONES DE ACCIÓN
+============================ */
+
+.btn-accion {
+width: 90%;
+margin: 10px auto;
+padding: 12px;
+font-weight: bold;
+border-radius: 8px;
+border: none;
+cursor: pointer;
+font-size: 16px;
+}
+
+/* INICIAR → verde */
+.btn-verde {
+background-color: #4CAF50;
+color: white;
+}
+
+/* TERMINAR → rojo */
+.btn-rojo {
+background-color: #E53935;
+color: white;
+}
+
+/* ENTREGADO → azul */
+.btn-azul {
+background-color: #2196F3;
+color: white;
+}
+
+/* Deshabilitado (cuando ya está entregado) */
+.btn-disabled {
+background-color: #cccccc;
+color: #666;
+}
+
+/* ====================================
+   CONTENEDOR – Tarjetas alineadas a la izquierda
+   ==================================== */
+.contenedor {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;  /* Se alinean a la IZQUIERDA */
+    gap: 15px !important; /* Espacio entre tarjetas */
+    padding: 15px !important;
+}
+
+/* ====================================
+   TARJETAS MÁS PEQUEÑAS
+   ==================================== */
+.tarjeta {
+    width: 260px !important;        /* un poco más pequeña */
+    min-height: 180px !important;
+    padding: 10px !important;
+    margin: 0 !important;           /* MUY importante para evitar huecos */
+    border-radius: 12px !important;
+}
+
+/* ====================================
+   TARJETAS MÁS BAJAS
+   ==================================== */
+.tarjeta {
+    width: 250px !important;       
+    min-height: 140px !important;   /* antes era ~200px, ahora es más baja */
+    padding: 8px !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+}
+
+/* ====================================
+   ENCABEZADO SIN BORDE BLANCO
+   ==================================== */
+.tarjeta .encabezado {
+    padding: 0 !important;                /* QUITA el margen interno */
+    height: 42px !important;              /* alto fijo, como el monitor original */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    border-top-left-radius: 10px;         /* redondear solo según tarjeta */
+    border-top-right-radius: 10px;
+}
+
+/* Ajuste de textos dentro del encabezado */
+.tarjeta .encabezado h3 {
+    margin: 2px 0 0 0 !important;
+    font-size: 16px !important;
+    font-weight: 700;
+}
+
+.tarjeta .encabezado .hora {
+    margin: 0 !important;
+    font-size: 12px !important;
+}
+
+/* ====================================
+   CONTENIDO MÁS CORTO Y COMPACTO
+   ==================================== */
+.tarjeta .contenido {
+    padding: 6px 4px !important;
+    font-size: 14px !important;
+}
+
+.tarjeta .contenido p,
+.tarjeta .contenido ul li {
+    margin: 2px 0 !important;
+}
+
+/* ====================================
+   BOTÓN MÁS PEQUEÑO
+   ==================================== */
+.btn-accion {
+    padding: 8px !important;
+    font-size: 14px !important;
+    margin-top: 6px !important;
+    margin-bottom: 4px !important;
+}
+
+/* ===================================================
+   ARREGLO FINAL — ENCABEZADO SIN BORDE BLANCO
+   =================================================== */
+
+.tarjeta .encabezado {
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 40px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+}
+
+/* Quita cualquier padding heredado */
+.encabezado {
+    padding: 0 !important;
+}
+
+/* ===================================================
+   ARREGLO FINAL — TARJETAS MÁS BAJAS Y COMPACTAS
+   =================================================== */
+
+.tarjeta {
+    height: auto !important;       /* elimina altura fija */
+    min-height: 135px !important;  /* altura real */
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 240px !important;       /* tamaño ideal como la imagen 2 */
+}
+
+/* Contenido compacto */
+.tarjeta .contenido {
+    padding: 6px 10px !important;
+    gap: 4px !important;
+}
+
+/* Texto más compacto */
+.tarjeta .contenido p,
+.tarjeta .contenido ul li {
+    margin: 2px 0 !important;
+    font-size: 14px !important;
+}
+
+/* ===================================================
+   BOTÓN AJUSTADO
+   =================================================== */
+.btn-accion {
+    margin-top: 8px !important;
+    margin-bottom: 10px !important;
+    padding: 8px !important;
+    font-size: 14px !important;
+}
+
+
+/* =============================
+   NOTIFICACIONES ESTILO MODERNO
+   ============================= */
+#notificaciones {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 2000;
+}
+
+.notificacion {
+    background: #ffffff;
+    padding: 15px 18px;
+    min-width: 260px;
+    max-width: 360px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-left: 6px solid #4CAF50; /* verde Listo */
+    position: relative;
+    animation: aparición 0.25s ease-out;
+    font-family: Arial, sans-serif;
+}
+
+.notificacion strong {
+    font-size: 15px;
+}
+
+.notificacion p {
+    margin: 6px 0 0 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.boton-cerrar {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+.boton-cerrar:hover {
+    color: #000;
+}
+
+@keyframes aparición {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
