@@ -43,9 +43,3 @@ urlpatterns = [
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
-
-    path('historial/', pedidos_views.historial_pedidos, name='historial_pedidos'),
-]
-=======
-]
->>>>>>> 67ce92b636632aa62be6ec27ba7a04f024838836
