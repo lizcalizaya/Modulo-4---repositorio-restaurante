@@ -13,3 +13,4 @@ urlpatterns = [
     # Endpoint de estadísticas
     path('estadisticas/tiempos/', estadisticas_tiempos, name='estadisticas-tiempos'),
 ]
+
