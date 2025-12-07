@@ -146,3 +146,7 @@ USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField' # Corregido el nombre
 >>>>>>> 67ce92b636632aa62be6ec27ba7a04f024838836
+USE_I18N = True
+USE_TZ = True
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField' # Corregido el nombre
+>>>>>>> 67ce92b636632aa62be6ec27ba7a04f024838836
