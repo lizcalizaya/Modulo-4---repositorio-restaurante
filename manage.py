@@ -2,7 +2,7 @@
 import os
 import sys
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'modulo04_pedidos.settings')
 
     try:
