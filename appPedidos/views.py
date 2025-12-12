@@ -11,11 +11,28 @@ from drf_spectacular.utils import extend_schema
 
 from .models import Pedido
 from .serializers import PedidoSerializer
-
+import requests
+from django.conf import settings
 
 def monitor(request):
     return render(request, 'monitor.html')
 
+
+def notificar_modulo3_listo(pedido: Pedido):
+    url = settings.MODULO3_API_BASE.rstrip("/") + settings.MODULO3_LISTO_ENDPOINT
+
+    payload = {
+        "id_pedido": pedido.id_modulo3 or pedido.id,
+        "numero_mesa": pedido.mesa,
+        "nombre_cliente": pedido.cliente,
+        "orden": pedido.descripcion,
+        "hora_salida": pedido.hora_listo.isoformat() if pedido.hora_listo else None,
+        "estado": pedido.estado,
+    }
+
+    # timeout para que no se “cuelgue” tu API
+    r = requests.post(url, json=payload, timeout=5)
+    r.raise_for_status()
 
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all().order_by('-fecha_creacion')
@@ -43,7 +60,27 @@ class PedidoViewSet(viewsets.ModelViewSet):
             )
 
         instance.estado = nuevo_estado
+
+        # 👇 si pasa a LISTO, guardamos hora_listo 1 sola vez
+        if nuevo_estado == "LISTO" and instance.hora_listo is None:
+            instance.hora_listo = timezone.now()
+
         instance.save()
+
+        # 👇 notificar al módulo 03
+        if nuevo_estado == "LISTO":
+            try:
+                notificar_modulo3_listo(instance)
+            except Exception as e:
+                # No rompas tu flujo si el módulo 03 está caído; solo registra/retorna aviso
+                return Response(
+                    {
+                        "pedido": PedidoSerializer(instance).data,
+                        "warning": f"Pedido pasó a LISTO pero no se pudo notificar a Módulo 03: {str(e)}"
+                    },
+                    status=status.HTTP_200_OK
+                )
+
         return Response(PedidoSerializer(instance).data)
 
     @action(detail=False, methods=['get'])
@@ -60,6 +97,52 @@ class PedidoViewSet(viewsets.ModelViewSet):
     def entregados(self, request):
         pedidos = Pedido.objects.filter(estado="ENTREGADO")
         return Response(PedidoSerializer(pedidos, many=True).data)
+    
+    @action(detail=False, methods=["post"], url_path="desde-modulo3")
+    def desde_modulo3(self, request):
+        """
+        Recibe pedido desde Módulo 03 y lo crea (o actualiza si ya existe).
+        
+        Se Espera recibir:
+
+        - id_pedido
+        - nro_mesa
+        - nombre_cliente
+        - orden
+
+        """
+        id_pedido = request.data.get("id_pedido")
+        nro_mesa = request.data.get("nro_mesa")
+        nombre_cliente = request.data.get("nombre_cliente")
+        orden = request.data.get("orden")
+
+        if id_pedido is None or nro_mesa is None or not nombre_cliente or orden is None:
+            return Response(
+                {"error": "Faltan campos. Requeridos: id_pedido, nro_mesa, nombre_cliente, orden"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        pedido, creado = Pedido.objects.get_or_create(
+            id_modulo3=int(id_pedido),
+            defaults={
+                "mesa": int(nro_mesa),
+                "cliente": str(nombre_cliente),
+                "descripcion": str(orden),
+                "estado": Pedido.EstadoPedido.CREADO,
+            }
+        )
+
+        # Si ya existía, puedes decidir si actualizas datos:
+        if not creado:
+            pedido.mesa = int(nro_mesa)
+            pedido.cliente = str(nombre_cliente)
+            pedido.descripcion = str(orden)
+            pedido.save()
+
+        return Response(
+            {"ok": True, "creado": creado, "pedido": PedidoSerializer(pedido).data},
+            status=status.HTTP_201_CREATED if creado else status.HTTP_200_OK
+        )
 
 
 def detalle_pedido(request, pedido_id):

@@ -244,13 +244,15 @@ async function cargarPedidos() {
       tarjeta.dataset.cliente = (p.cliente || "").toLowerCase();
       tarjeta.dataset.fecha   = p.fecha_creacion;
 
+      const idMostrado = p.id_modulo3 || p.id;
+
       tarjeta.innerHTML = `
         <div class="encabezado">
           <h3 class="mesa">MESA ${p.mesa}</h3>
           <p class="hora">[${formatearHora(p.fecha_creacion)}]</p>
         </div>
         <div class="contenido">
-          <p>PEDIDO #${p.id}</p>
+          <p>PEDIDO #${idMostrado}</p>
           <ul>
             <p class="linea-cliente">Cliente: ${p.cliente || "Sin cliente"}</p>
             <p> Orden: ${p.descripcion || "Sin descripción"}</p>

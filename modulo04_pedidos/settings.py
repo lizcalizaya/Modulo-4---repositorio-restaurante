@@ -74,6 +74,10 @@ else:
         }
     }
 
+# ---------- MODULO 03 (API EXTERNA) ----------
+MODULO3_API_BASE = os.environ.get("MODULO3_API_BASE")
+MODULO3_LISTO_ENDPOINT = os.environ.get("MODULO3_LISTO_ENDPOINT")
+
 
 # ---------- STATIC FILES ----------
 STATIC_URL = '/static/'
