@@ -9,6 +9,8 @@ router.register(r'pedidos', PedidoViewSet, basename='pedido')
 urlpatterns = [
     # Endpoints del ViewSet
     path('', include(router.urls)),
+    path("debug-db/", debug_db),
+
 
     # Endpoint de estadísticas
     path('estadisticas/tiempos/', estadisticas_tiempos, name='estadisticas-tiempos'),
