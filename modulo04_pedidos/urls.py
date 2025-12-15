@@ -7,13 +7,11 @@ from appPedidos.views import (
     detalle_pedido,
     administrar_pedidos,
     editar_pedido,
-    PedidoViewSet
 )
 from appPedidos import views as pedidos_views
 
 # ViewSet manuales
 cola_cocina_view = PedidoViewSet.as_view({'get': 'list'})
-pedido_estado_view = PedidoViewSet.as_view({'patch': 'update'})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
