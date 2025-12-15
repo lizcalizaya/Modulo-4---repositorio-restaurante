@@ -58,22 +58,19 @@ class PedidoViewSet(viewsets.ModelViewSet):
         "ENTREGADO": []
     }
 
-    # 🔹 LIST seguro
-    def list(self, request, *args, **kwargs):
-        """
-        GET /api/pedidos/
-        Devuelve todos los pedidos sin tocar estados ni transiciones.
-        """
-        try:
-            queryset = self.get_queryset()
-            serializer = self.get_serializer(queryset, many=True)
-            return Response(serializer.data)
-        except Exception as e:
-            print("ERROR EN LIST():", e)
-            return Response(
-                {"error": "Ocurrió un error al listar pedidos."},
-                status=500
-            )
+   def list(self, request, *args, **kwargs):
+    try:
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        # 🔹 imprime el error real en logs de Render
+        import traceback
+        traceback.print_exc()
+        return Response(
+            {"error": str(e)},  # devuelve el mensaje real para debugging
+            status=500
+        )
 
     # 🔹 UPDATE seguro
     def update(self, request, *args, **kwargs):
