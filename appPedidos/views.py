@@ -35,7 +35,7 @@ def notificar_modulo3_listo(pedido: Pedido):
     r.raise_for_status()
 
 class PedidoViewSet(viewsets.ModelViewSet):
-    queryset = Pedido.objects.all().order_by('-fecha_creacion')
+    queryset = Pedido.objects.none()
     serializer_class = PedidoSerializer
 
     transiciones = {
