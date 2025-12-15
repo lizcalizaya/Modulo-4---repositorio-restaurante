@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.db.models import Q, Avg, Min, Max, F, ExpressionWrapper, DurationField
 from django import forms
+from django.http import JsonResponse
+from django.db import connection
+
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view
@@ -13,6 +16,12 @@ from .models import Pedido
 from .serializers import PedidoSerializer
 import requests
 from django.conf import settings
+
+
+def debug_db(request):
+    return JsonResponse({
+        "tables": connection.introspection.table_names()
+    })
 
 def monitor(request):
     return render(request, 'monitor.html')
