@@ -17,11 +17,15 @@ from .serializers import PedidoSerializer
 import requests
 from django.conf import settings
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
+@api_view(["GET"])
 def debug_db(request):
-    return JsonResponse({
-        "tables": connection.introspection.table_names()
+    return Response({
+        "total_pedidos": Pedido.objects.count()
     })
+
 
 def monitor(request):
     return render(request, 'monitor.html')
