@@ -46,7 +46,6 @@ def notificar_modulo3_listo(pedido: Pedido):
     # timeout para que no se “cuelgue” tu API
     r = requests.post(url, json=payload, timeout=5)
     r.raise_for_status()
-
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all().order_by("-fecha_creacion")
     serializer_class = PedidoSerializer
@@ -63,14 +62,13 @@ class PedidoViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         """
         GET /api/pedidos/
-        Siempre devuelve todos los pedidos sin tocar estados ni transiciones.
+        Devuelve todos los pedidos sin tocar estados ni transiciones.
         """
         try:
             queryset = self.get_queryset()
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data)
         except Exception as e:
-            # Log para debugging en Render
             print("ERROR EN LIST():", e)
             return Response(
                 {"error": "Ocurrió un error al listar pedidos."},
@@ -99,18 +97,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
         instance.save()
 
-        # Notificar al módulo 03
-        if nuevo_estado == "LISTO":
-            try:
-                notificar_modulo3_listo(instance)
-            except Exception as e:
-                return Response(
-                    {
-                        "pedido": PedidoSerializer(instance).data,
-                        "warning": f"Pedido pasó a LISTO pero no se pudo notificar a Módulo 03: {str(e)}"
-                    },
-                    status=status.HTTP_200_OK
-                )
+        # Notificación a módulo 03 eliminada temporalmente
+        # Para evitar dependencias externas y errores en deploy
 
         return Response(PedidoSerializer(instance).data)
 
