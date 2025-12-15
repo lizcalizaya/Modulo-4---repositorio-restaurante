@@ -46,6 +46,7 @@ def notificar_modulo3_listo(pedido: Pedido):
     # timeout para que no se “cuelgue” tu API
     r = requests.post(url, json=payload, timeout=5)
     r.raise_for_status()
+    
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.all().order_by("-fecha_creacion")
     serializer_class = PedidoSerializer
@@ -58,24 +59,23 @@ class PedidoViewSet(viewsets.ModelViewSet):
         "ENTREGADO": []
     }
 
-   def list(self, request, *args, **kwargs):
-    try:
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
-    except Exception as e:
-        # 🔹 imprime el error real en logs de Render
-        import traceback
-        traceback.print_exc()
-        return Response(
-            {"error": str(e)},  # devuelve el mensaje real para debugging
-            status=500
-        )
+    # 🔹 LIST seguro
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return Response({"error": str(e)}, status=500)
 
     # 🔹 UPDATE seguro
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         nuevo_estado = request.data.get("estado", None)
+        ...
+
 
         if nuevo_estado is None:
             return super().update(request, *args, **kwargs)
