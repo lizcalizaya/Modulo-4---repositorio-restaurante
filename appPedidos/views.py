@@ -59,6 +59,25 @@ class PedidoViewSet(viewsets.ModelViewSet):
         "ENTREGADO": []
     }
 
+    # 🔹 LIST seguro
+    def list(self, request, *args, **kwargs):
+        """
+        GET /api/pedidos/
+        Siempre devuelve todos los pedidos sin tocar estados ni transiciones.
+        """
+        try:
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            # Log para debugging en Render
+            print("ERROR EN LIST():", e)
+            return Response(
+                {"error": "Ocurrió un error al listar pedidos."},
+                status=500
+            )
+
+    # 🔹 UPDATE seguro
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
         nuevo_estado = request.data.get("estado", None)
@@ -74,18 +93,17 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
         instance.estado = nuevo_estado
 
-        # 👇 si pasa a LISTO, guardamos hora_listo 1 sola vez
+        # Si pasa a LISTO, guardamos hora_listo 1 sola vez
         if nuevo_estado == "LISTO" and instance.hora_listo is None:
             instance.hora_listo = timezone.now()
 
         instance.save()
 
-        # 👇 notificar al módulo 03
+        # Notificar al módulo 03
         if nuevo_estado == "LISTO":
             try:
                 notificar_modulo3_listo(instance)
             except Exception as e:
-                # No rompas tu flujo si el módulo 03 está caído; solo registra/retorna aviso
                 return Response(
                     {
                         "pedido": PedidoSerializer(instance).data,
@@ -96,6 +114,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
         return Response(PedidoSerializer(instance).data)
 
+    # 🔹 Filtrados por estado
     @action(detail=False, methods=['get'])
     def filtrados(self, request):
         estado = request.query_params.get('estado', 'CREADO').upper()
@@ -106,24 +125,15 @@ class PedidoViewSet(viewsets.ModelViewSet):
             "resultados": PedidoSerializer(pedidos, many=True).data
         })
 
+    # 🔹 Pedidos entregados
     @action(detail=False, methods=['get'])
     def entregados(self, request):
         pedidos = Pedido.objects.filter(estado="ENTREGADO")
         return Response(PedidoSerializer(pedidos, many=True).data)
-    
+
+    # 🔹 Crear/actualizar desde módulo 03
     @action(detail=False, methods=["post"], url_path="desde-modulo3")
     def desde_modulo3(self, request):
-        """
-        Recibe pedido desde Módulo 03 y lo crea (o actualiza si ya existe).
-        
-        Se Espera recibir:
-
-        - id_pedido
-        - nro_mesa
-        - nombre_cliente
-        - orden
-
-        """
         id_pedido = request.data.get("id_pedido")
         nro_mesa = request.data.get("nro_mesa")
         nombre_cliente = request.data.get("nombre_cliente")
@@ -145,7 +155,6 @@ class PedidoViewSet(viewsets.ModelViewSet):
             }
         )
 
-        # Si ya existía, puedes decidir si actualizas datos:
         if not creado:
             pedido.mesa = int(nro_mesa)
             pedido.cliente = str(nombre_cliente)
