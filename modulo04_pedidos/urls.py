@@ -7,20 +7,17 @@ from appPedidos.views import (
     detalle_pedido,
     administrar_pedidos,
     editar_pedido,
-    PedidoViewSet
+    historial_pedidos
 )
-from appPedidos import views as pedidos_views
-
-# ViewSet manuales
-cola_cocina_view = PedidoViewSet.as_view({'get': 'list'})
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
 
     # Página inicio -> monitor
     path('', monitor, name='monitor'),
 
-    # API
+    # API: usa solo el router de appPedidos
     path('api/', include('appPedidos.urls')),  
 
     # Monitor y detalle
@@ -31,14 +28,12 @@ urlpatterns = [
     path('administrar-pedidos/', administrar_pedidos, name='administrar_pedidos'),
     path('administrar-pedidos/editar/<int:pedido_id>/', editar_pedido, name='editar_pedido'),
 
-    # Cocina
-    path('cocina/cola/', cola_cocina_view, name='cocina_cola'),
-
     # Historial
-    path('historial/', pedidos_views.historial_pedidos, name='historial_pedidos'),
+    path('historial/', historial_pedidos, name='historial_pedidos'),
 
     # Swagger y Redoc
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
+
