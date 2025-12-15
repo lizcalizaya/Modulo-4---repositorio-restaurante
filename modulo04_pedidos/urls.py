@@ -7,6 +7,7 @@ from appPedidos.views import (
     detalle_pedido,
     administrar_pedidos,
     editar_pedido,
+    PedidoViewSet
 )
 from appPedidos import views as pedidos_views
 
